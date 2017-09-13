@@ -1,0 +1,43 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+    
+        {
+            "name": "Google Cloud Local DEBUG",
+            "type": "python",
+            "request": "attach",
+            "host": "localhost",
+            "secret": "gae",
+            "port": 3000,
+            "remoteRoot": "${workspaceRoot}",
+            "localRoot": "${workspaceRoot}",
+            "preLaunchTask": "python"
+        },
+        {
+            "name": "Python",
+            "type": "python",
+            "request": "launch",
+            "stopOnEntry": true,
+            "pythonPath": "${config:python.pythonPath}",
+            "program": "${file}",
+            "cwd": "${workspaceRoot}",
+            "env": {},
+            "envFile": "${workspaceRoot}/.env",
+            "debugOptions": [
+                "WaitOnAbnormalExit",
+                "WaitOnNormalExit",
+                "RedirectOutput"
+            ]
+        },
+        {
+            "name": "Attach (Remote Debug)",
+            "type": "python",
+            "request": "attach",
+            "localRoot": "${workspaceRoot}",
+            "remoteRoot": "${workspaceRoot}",
+            "port": 3000,
+            "secret": "my_secret",
+            "host": "localhost"
+        }
+    ]
+}
