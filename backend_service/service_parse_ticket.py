@@ -43,13 +43,13 @@ class MainController(webapp2.RequestHandler):
 			urlfetch.set_default_fetch_deadline(90)
 			
 			try:
-				http_headers={'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',}
+				http_headers={'Accept-Charset': 'utf-8;q=0.7,*;q=0.7',}
 				website = urlfetch.fetch(url=ticket.url, headers=http_headers )
 			except:
 				print "ERROR: URLFETCH of detail page failed"
 			
 			try:
-				website = website.encode('iso-8559-1').decode('utf-8')
+				website.content = website.content.encode('utf-8').decode('iso-8559-1')
 			except:
 				print "encoding went wrong"
 			
@@ -69,8 +69,6 @@ class MainController(webapp2.RequestHandler):
 				ticket.put()
 				print "=== >> ERROR Counld not Save Ticket"
 				print("Unexpected error:", sys.exc_info()[0])
-				
-				raise
 
 ROUTES = [
 	webapp2.Route(r'/admin/', handler=MainController, name='admin'),

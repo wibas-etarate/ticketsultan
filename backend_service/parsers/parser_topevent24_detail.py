@@ -19,6 +19,7 @@ content_part_ticket_prices = content_part.findall(".//table")[4]
 #	print cleaner2.clean_html(etree.tostring(td))
 #
 #print "*********************************************************"
+print "-- Starting parsing parser_topevent24_detail.py"
 print "Ticket URL : " + ticket.url
 
 # Clean out all the bullshit

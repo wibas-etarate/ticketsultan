@@ -46,10 +46,14 @@ class MainController(webapp2.RequestHandler):
 			tree = html.fromstring(page)
 			
 			try:
+				print "executing file " +str(file)
 				execfile('./backend_service/parsers/'+file)
-			except:
+				print "executing file " +str(file) + " success"
+			except Exception as e:
+				print ""
+				print ""
+				print e
 				print("Unexpected error:", sys.exc_info()[0])
-				raise
 		
 ROUTES = [
 	webapp2.Route(r'/admin/parse_source', handler=MainController, name='parse'),

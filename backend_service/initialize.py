@@ -27,7 +27,7 @@ class InitController(webapp2.RequestHandler):
 		
 		#cities = ['Mainz','Berlin','Bilefeld','Bonn','Bremen','Dresden',u'Düsseldorf','Erlangen','Freiburg','Hamburg','Hannover','Heidelberg','Heilbronn','Karlsruhe','Kiel','Leipzig','Leverkusen','Magdeburg']
 		#pages = [6,351,16,42,30,101,97,4,6,260,66,9,21,15,14,112,15,26]
-		pages = [10,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+		pages = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 		
 		#populating cities an Countries
 		countries = [u'München','Deutschland', u'Österreich', 'Schweiz']
@@ -52,7 +52,7 @@ class InitController(webapp2.RequestHandler):
 		
 		
 		cities = [u'München','Mainz','Berlin']
-		pages = [10,1,1]
+		pages = [1,1,1]
 		
 		p_i = 0
 		for city in cities:

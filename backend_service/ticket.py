@@ -26,12 +26,12 @@ class Ticket(ndb.Model):
 			print ".....updating ndb model for search"	
 			try:
 				document = search.Document(
-				    doc_id = str(self.key.id()),
+				    doc_id = str(sf.key.id()),
 				    fields=[
 				       search.TextField(name='name', value=self.name),
 				       search.DateField(name='date', value=self.start),
-				       search.TextField(name='city', value=self.city.city_name),
-				       search.TextField(name='country', value=self.country.country_name),
+				       #search.TextField(name='city', value=self.city.city_name),
+				       #search.TextField(name='country', value=self.country.country_name),
 				       ])
 			except:
 				print "... Error creating the search document."
