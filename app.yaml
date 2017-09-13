@@ -1,0 +1,58 @@
+runtime: python27
+api_version: 1
+threadsafe: false
+
+handlers: 
+- url: /admin/bower_components
+  static_dir: backend_service/views/adminUI/bower_components
+
+- url: /admin/plugins
+  static_dir: backend_service/views/adminUI/plugins
+
+- url: /admin/dist
+  static_dir: backend_service/views/adminUI/dist
+
+- url: /admin/pages
+  static_dir: backend_service/views/adminUI/pages
+
+# Service for parsing sources and create tickets
+- url: /admin/parse_source
+  script: backend_service.service_parse.app
+  
+# Service for parsing and updating the ticket in detail
+- url: /admin/parse_ticket
+  script: backend_service.service_parse_ticket.app
+  login: admin
+  
+- url: /admin/init
+  script: backend_service.initialize.app
+
+- url: /admin/.*
+  script: backend_service.service_backend.app 
+  
+# FRONTEND SERVICE
+- url: /css
+  static_dir: frontend_service/template_engine/css
+
+- url: /fonts
+  static_dir: frontend_service/template_engine/fonts
+
+- url: /images
+  static_dir: frontend_service/template_engine/images
+
+- url: /js
+  static_dir: frontend_service/template_engine/js
+
+- url: /search/.*
+  script: frontend_service.ticket_sultan_frontend_service.app 
+- url: /.*
+  script: frontend_service.ticket_sultan_frontend_service.app 
+
+
+libraries:
+- name: jinja2
+  version: latest
+- name: webapp2
+  version: "2.5.2"
+- name: lxml
+  version: latest

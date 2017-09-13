@@ -1,0 +1,4 @@
+cron: 
+- description: fetch data
+  url: /admin/jobs/cron
+  schedule: every 20 mins
