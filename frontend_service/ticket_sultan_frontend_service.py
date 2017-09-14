@@ -8,6 +8,8 @@ import sys
 import datetime
 from datetime import timedelta
 
+print sys.path
+
 sys.path.append('../ticket_sultan/backend_service')
 
 from google.appengine.api import users
@@ -16,7 +18,7 @@ from google.appengine.api import search
 
 import jinja2
 import webapp2
-from ticket import *
+from backend_service.ticket import *
 
 
 

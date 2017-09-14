@@ -3,6 +3,9 @@ api_version: 1
 threadsafe: false
 
 handlers: 
+- url: /debug
+  script: debug_infos.app
+
 - url: /admin/bower_components
   static_dir: backend_service/views/adminUI/bower_components
 

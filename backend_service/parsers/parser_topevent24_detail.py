@@ -78,11 +78,9 @@ ticket_date = clean_html( find_and_get_next_td( content_part_tables, ticket_date
 ticket.start = datetime.strptime(ticket_date, '%d.%m.%y')
 print "TICKET DATE :" + str(ticket.start)
 
-country = Country.query(Country.country_name=='Deutschland')
-country_list = []
-for c in country:
-	country_list.append(c.key)
-ticket.country = country_list
+country = Country.query(Country.country_name=='Deutschland').get()
+
+ticket.country = country.key
 
 
 

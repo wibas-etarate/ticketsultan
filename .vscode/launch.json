@@ -8,7 +8,7 @@
             "request": "attach",
             "host": "localhost",
             "secret": "gae",
-            "port": 3000,
+            "port": 3100,
             "remoteRoot": "${workspaceRoot}",
             "localRoot": "${workspaceRoot}",
             "preLaunchTask": "python"
@@ -28,16 +28,6 @@
                 "WaitOnNormalExit",
                 "RedirectOutput"
             ]
-        },
-        {
-            "name": "Attach (Remote Debug)",
-            "type": "python",
-            "request": "attach",
-            "localRoot": "${workspaceRoot}",
-            "remoteRoot": "${workspaceRoot}",
-            "port": 3000,
-            "secret": "my_secret",
-            "host": "localhost"
         }
     ]
 }

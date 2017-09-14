@@ -14,7 +14,7 @@ class Location(ndb.Model):
 
 # City for Tickets
 class City(ndb.Model):
-	city_name = ndb.StringProperty(required=False)
+	city_name = ndb.StringProperty(required=True)
 	country = ndb.KeyProperty(kind='Country', repeated=False)
 	
 	

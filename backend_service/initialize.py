@@ -25,14 +25,13 @@ class InitController(webapp2.RequestHandler):
 		print "initializing... tickets, sources, cities, countries ... dropped"
 		# Ticket 24 
 		
-		#cities = ['Mainz','Berlin','Bilefeld','Bonn','Bremen','Dresden',u'Düsseldorf','Erlangen','Freiburg','Hamburg','Hannover','Heidelberg','Heilbronn','Karlsruhe','Kiel','Leipzig','Leverkusen','Magdeburg']
-		#pages = [6,351,16,42,30,101,97,4,6,260,66,9,21,15,14,112,15,26]
-		pages = [10,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 		
 		#populating cities an Countries
-		countries = [u'München','Deutschland', u'Österreich', 'Schweiz']
-		cities = ['Mainz','Berlin','Bilefeld','Bonn','Bremen','Dresden',u'Düsseldorf','Erlangen','Freiburg','Hamburg','Hannover','Heidelberg','Heilbronn','Karlsruhe','Kiel','Leipzig','Leverkusen','Magdeburg']
-		
+		countries = ['Deutschland', u'Österreich', 'Schweiz']
+		cities = ['Mainz','Berlin','Bilefeld','Bonn','Bremen','Dresden',u'Düsseldorf','Erlangen','Freiburg','Hamburg','Hannover','Heidelberg','Heilbronn','Karlsruhe','Kiel','Leipzig','Leverkusen','Magdeburg',u'München']
+		pages = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+		##pages = [6,351,16,42,30,101,97,4,6,260,66,9,21,15,14,112,15,26,110]
+		#Fill in countries into DB
 		for country in countries:
 			c = Country()
 			c.country_name = country
@@ -41,9 +40,7 @@ class InitController(webapp2.RequestHandler):
 			if c.country_name == 'Deutschland':
 				country_de = c
 		
-		country_de_list = []
-		country_de_list.append(c.key)
-		
+		#Fill in cities into DB
 		for city in cities:
 			ci = City()
 			ci.city_name = city
@@ -52,7 +49,7 @@ class InitController(webapp2.RequestHandler):
 		
 		
 		cities = [u'München','Mainz','Berlin']
-		pages = [10,1,1]
+		pages = [1,1,1]
 		
 		p_i = 0
 		for city in cities:

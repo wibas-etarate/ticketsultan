@@ -23,15 +23,21 @@ class Ticket(ndb.Model):
 	
 	def _post_put_hook(self, future):
 		if self.status == 'success':
-			print ".....updating ndb model for search"	
+			print ".....updating ndb model for search"
+			print "saved country"
+			print self.country
+
+			#model_city = City.get_by_id(self.city.key)
+			#model_country = Country.get_by_id(self.country.key)
+
 			try:
 				document = search.Document(
 				    doc_id = str(self.key.id()),
 				    fields=[
 				       search.TextField(name='name', value=self.name),
 				       search.DateField(name='date', value=self.start),
-				       search.TextField(name='city', value=self.city.city_name),
-				       search.TextField(name='country', value=self.country.country_name),
+				       #search.TextField(name='city', value=model_city.city_name),
+				       #search.TextField(name='country', value=model_country.country_name),
 				       ])
 			except:
 				print "... Error creating the search document."
