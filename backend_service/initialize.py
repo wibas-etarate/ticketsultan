@@ -25,13 +25,6 @@ class InitController(webapp2.RequestHandler):
 		print "initializing... tickets, sources, cities, countries ... dropped"
 		# Ticket 24 
 		
-<<<<<<< HEAD
-=======
-		#cities = ['Mainz','Berlin','Bilefeld','Bonn','Bremen','Dresden',u'Düsseldorf','Erlangen','Freiburg','Hamburg','Hannover','Heidelberg','Heilbronn','Karlsruhe','Kiel','Leipzig','Leverkusen','Magdeburg']
-		#pages = [6,351,16,42,30,101,97,4,6,260,66,9,21,15,14,112,15,26]
-		pages = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
->>>>>>> ac3df9114a865ae4b223fc1a5d18f211641309da
-		
 		#populating cities an Countries
 		countries = ['Deutschland', u'Österreich', 'Schweiz']
 		cities = ['Mainz','Berlin','Bilefeld','Bonn','Bremen','Dresden',u'Düsseldorf','Erlangen','Freiburg','Hamburg','Hannover','Heidelberg','Heilbronn','Karlsruhe','Kiel','Leipzig','Leverkusen','Magdeburg',u'München']
