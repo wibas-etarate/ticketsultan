@@ -9,6 +9,12 @@ import logging
 
 from google.appengine.ext import ndb
 
+class SearchUpdateController(webapp2.RequestHandler):
+	def get(self):
+		tickets = Ticket().query()
+		for ticket in tickets:
+			ticket.build_search_index()
+
 
 class InitController(webapp2.RequestHandler):
 	def get(self):
@@ -55,7 +61,7 @@ class InitController(webapp2.RequestHandler):
 			ci.country = country_de.key
 			ci.put()
 		
-		# Create sources
+		# Create sources for
 		for city,pages in cities:
 			for page in range(1,pages):
 				source = Source()
@@ -67,10 +73,13 @@ class InitController(webapp2.RequestHandler):
 				source.parser_file_detail = 'parser_topevent24_detail.py'
 				source.put()
 		
+
+
 		logging.info('Initilization complete')
 # Define available routes
 ROUTES = [
 	webapp2.Route(r'/admin/init', handler=InitController, name='sources'),
+	webapp2.Route(r'/admin/init_search', handler=SearchUpdateController, name='search'),
 ]
 
 app = webapp2.WSGIApplication(ROUTES, debug=True)

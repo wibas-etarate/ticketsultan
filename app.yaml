@@ -29,7 +29,9 @@ handlers:
   
 - url: /admin/init
   script: backend_service.initialize.app
+- url: /admin/init_search
 
+  script: backend_service.initialize.app
 - url: /admin/.*
   script: backend_service.service_backend.app 
   

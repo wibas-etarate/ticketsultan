@@ -23,27 +23,30 @@ class Ticket(ndb.Model):
 	updated = ndb.DateTimeProperty(auto_now=True)
 	
 	def _post_put_hook(self, future):
+		build_search_index(self)
+		
+	def build_search_index(self):
 		if self.status == 'success':
+			logging.debug('Updating search index for ' + str(self.key.id()))
 			model_city = self.city.get()
 			model_country = self.country.get()
 
 			try:
 				document = search.Document(
-				    doc_id = str(self.key.id()),
-				    fields=[
-				       search.TextField(name='name', value=self.name, language='de'),
-				       search.DateField(name='date', value=self.start),
-				       search.TextField(name='city', value=model_city.city_name, language='de'),
-				       search.TextField(name='country', value=model_country.country_name),
-					   search.NumberField(name='price', value=self.price)
-				       ])
+					doc_id = str(self.key.id()),
+					fields=[
+					search.TextField(name='name', value=self.name, language='de'),
+					search.DateField(name='date', value=self.start),
+					search.TextField(name='city', value=model_city.city_name, language='de'),
+					search.TextField(name='country', value=model_country.country_name),
+					search.NumberField(name='price', value=self.price)
+					])
 			except Exception as e:
 				logging.error("there is an error in the search document")
 				logging.error(e)
 			try:
-			    logging.debug('search index creation success')
-			    index = search.Index(name="ticketsearchindex").put(document)
+				logging.debug('search index creation success')
+				index = search.Index(name="ticketsearchindex").put(document)
 			except Exception as e:
 				logging.error('saving of the search document failed')
 				logging.error(e)
-	

@@ -116,6 +116,7 @@
 						<p class="hero-caption">We search all your favorite tickets and find the lowest price.<br>We already have {{ ticket_count }} tickets waiting for you.</p>
 						<div class="hero-search">
 							<form action="/search/" method="get">
+								<input type="hidden" name="page" value="1">
 								<input type="text" name="q" placeholder="Seach Artist, Location or date">
 								<input type="submit" style="visibility: hidden;" />
 							</form>
@@ -141,7 +142,7 @@
 						<ul class="clearfix">
 							{% for ticket in tickets_next %}
 							<li class="event-1">
-								<span class="event-time">00:00 <strong>AM</strong> {{ ticket.city }} </span>
+								<span class="event-time">00:00 <strong>AM</strong> {{ ticket.city.get().city_name }} </span>
 								<strong class="event-name">{{ ticket.name }}</strong>
 								<a href="#" class="get-ticket">Get Ticket</a>
 							</li>

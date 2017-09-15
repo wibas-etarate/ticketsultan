@@ -16,10 +16,12 @@ sys.path.append('../ticket_sultan/backend_service')
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.api import search
+from google.appengine.api import memcache
 
 import jinja2
 import webapp2
 from backend_service.ticket import *
+from backend_service.location import *
 
 
 
@@ -36,23 +38,43 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 # Welcome Screen
 class MainController(webapp2.RequestHandler):
     def get(self):
-		tickets = Ticket.query().order()
+
+		#Cache the Ticket count (so only first access is slow)
+		ticket_count = memcache.get('ticket_count')
+		if ticket_count is None:
+			logging.info("writing ticket count to memcache")
+			ticket_option=ndb.QueryOptions(keys_only=True)
+			tickets = Ticket.query().fetch(options=ticket_option)
+			ticket_count = len(tickets)
+			
+			memcache.add('ticket_count',ticket_count,3600)
 
 		today = datetime.datetime.now()
 		
 		yesterday = datetime.timedelta(days=-1)
 		# tickets from today
-		tickets_today = Ticket.query(Ticket.start >= today-yesterday).filter(Ticket.start <= today)
-		#tickets_today = tickets_today.filter(Ticket.start <= today)
+		#blow into cache to speed up
+		tickets_today = memcache.get('tickets_today')
+		if tickets_today is None:
+			logging.info("writing todays tickets to memcache")
+			tickets_today = Ticket.query(Ticket.start >= today-yesterday).filter(Ticket.start <= today)
+			memcache.add('tickets_today', tickets_today, 360)
+		
 		# the next 4 tickets from today on
-		tickets_next = Ticket.query(Ticket.start >= today).order(Ticket.start).fetch(limit=4)
+		tickets_next = memcache.get('tickets-net')
+		if tickets_next is None:
+			logging.info("writing next tickets to memcache")
+			tickets_next = Ticket.query(Ticket.start >= today).order(Ticket.start).fetch(limit=4)
+			memcache.add('tickets_next',tickets_next,120)
+
 		#tickets_next = tickets_next_query.fetch(limit=4)
 		
-		logging.info("Loaded Tickets from database " + str(tickets.count()))
+		logging.info("Loaded Tickets from database " + str(ticket_count))
 		
 		template_values = {
-			'ticket_count': str( tickets.count() ),
-			'tickets': tickets,
+			'ticket_count': str( ticket_count ),
+			'tickets_today': tickets_today,
+			'tickets_next': tickets_next,
 		}
 		
 		template = JINJA_ENVIRONMENT.get_template('template_engine/homepage-1.html')
@@ -60,7 +82,7 @@ class MainController(webapp2.RequestHandler):
 
 # Helper class for Paging
 class PageController(object):
-	page_current = 0
+	page_current = 1
 	page_next = 0
 	page_list = ['1','2']
 	page_prev = 0
@@ -114,29 +136,51 @@ class PageController(object):
 #Search detail page    
 class SearchController(webapp2.RequestHandler):
     def get(self):
-    	"""Search Request on page /search/"""
-    	search_string = self.request.get('q')	
-    	
-    	page_controller = PageController(self.request)
-    	
-    	search_options = search.QueryOptions(limit = _PAGING_LIMIT_PER_PAGE, offset = page_controller.get_page_offset() )    	
-    	search_query = search.Query(query_string=search_string,options=search_options)
-    	search_results = search.Index(name='ticketsearchindex').search(query=search_query)
-    	
-    	page_infos = page_controller.calculate(search_results)
-    
-    	
-    	template_values = {
+		"""Search Request on page /search/"""
+		q = self.request.get('q') 
+		search_string = q
+		location = self.request.get('location')
+		
+		#Cache cities
+		locations = memcache.get('locations')
+		if locations is None:
+			logging.info("writing Cities to memcache")
+			locations = City.query()
+			memcache.add('locations',locations,3600)
+		
+		page_controller = PageController(self.request)
+		
+
+		if location is not '' and len(location) > 5:
+			print "location :" + str(location)
+			if len(q) > 2:
+				search_string = search_string + ' AND'
+			search_string = search_string + " city=" + location
+		
+		#clean searchstring
+		search_string = search_string.strip()
+ 
+		search_options = search.QueryOptions(limit = _PAGING_LIMIT_PER_PAGE, offset = page_controller.get_page_offset() )    	
+		search_query = search.Query(query_string=search_string,options=search_options)
+		search_results = search.Index(name='ticketsearchindex').search(query=search_query)
+
+		logging.info('generated search string: ' +str(search_string))
+
+		page_infos = page_controller.calculate(search_results)
+		
+		template_values = {
             'tickets':search_results,
             'ticket_count':search_results.number_found,
             'ticket_show':len(search_results.results),
             'paging':page_controller,
+			'q':q,
+			'locations':locations,
+			'location':location,
         }
-        
-        template = JINJA_ENVIRONMENT.get_template('template_engine/search-result.html')
-        self.response.write(template.render(template_values))
+		
+		template = JINJA_ENVIRONMENT.get_template('template_engine/search-result.html')
+		self.response.write(template.render(template_values))
 
-        
 # Define available routes
 ROUTES = [
 	webapp2.Route(r'/', handler=MainController, name='welcome'),
