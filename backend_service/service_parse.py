@@ -9,23 +9,19 @@ import logging
 import traceback
 import webapp2
 import jinja2
+import time
 from lxml import html, etree
 from lxml.html.clean import Cleaner
-
-
 from source import *
 from ticket import *
-
 from google.appengine.api import urlfetch
 from google.appengine.api import taskqueue
-
-from source import *
 
 JINJA_ENVIRONMENT = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),extensions=['jinja2.ext.autoescape'],autoescape=True)
 
 class MainController(webapp2.RequestHandler):
     def get(self):
-		sources = Source().query()
+		sources = Source().query(Source.status=='new')
 		logging.info('Service Parse - Start Parsing')
 		logging.debug('Loaded : ' + str(sources.count()) + ' sources')
 		
@@ -46,14 +42,16 @@ class MainController(webapp2.RequestHandler):
 			tree = html.fromstring(page)
 			
 			try:
-				print "executing file " +str(file)
+				logging.info('Service Parse - Start Parsing executing file '+str(file))
 				execfile('./backend_service/parsers/'+file)
-				print "executing file " +str(file) + " success"
+				source.status = 'success'
+				source.put()
+				time.sleep(1) # Not stress the endpoint to much, we wait some time before catching the next page
+				logging.debug('Parser executed successfully')
 			except Exception as e:
-				print ""
-				print ""
-				print e
-				print("Unexpected error:", sys.exc_info()[0])
+				source.status = 'failed'
+				source.put()
+				logging.error(e)
 		
 ROUTES = [
 	webapp2.Route(r'/admin/parse_source', handler=MainController, name='parse'),

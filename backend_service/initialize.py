@@ -5,6 +5,7 @@ from google.appengine.api import taskqueue
 from source import *
 from ticket import *
 from location import *
+import logging
 
 from google.appengine.ext import ndb
 
@@ -14,22 +15,30 @@ class InitController(webapp2.RequestHandler):
 		# Purge Task Queue
 		q = taskqueue.Queue('default')
 		q.purge()
-		print "initializing... queue purged"
+		logging.info('initializing... queue purged')
 		
 		# Delete existing entities:
 		ndb.delete_multi(Source.query().fetch(keys_only=True))
+		logging.debug('.. deleted Sources')
 		ndb.delete_multi(Ticket.query().fetch(keys_only=True))
+		logging.debug('.. deleted Tickets')
 		ndb.delete_multi(Country.query().fetch(keys_only=True))
+		logging.debug('.. deleted Countries')
 		ndb.delete_multi(City.query().fetch(keys_only=True))
+		logging.debug('.. deleted Cities')
 		
-		print "initializing... tickets, sources, cities, countries ... dropped"
+		logging.info('datastore initialized and emptied')
 		# Ticket 24 
 		
 		#populating cities an Countries
 		countries = ['Deutschland', u'Österreich', 'Schweiz']
-		cities = ['Mainz','Berlin','Bilefeld','Bonn','Bremen','Dresden',u'Düsseldorf','Erlangen','Freiburg','Hamburg','Hannover','Heidelberg','Heilbronn','Karlsruhe','Kiel','Leipzig','Leverkusen','Magdeburg',u'München']
-		pages = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-		##pages = [6,351,16,42,30,101,97,4,6,260,66,9,21,15,14,112,15,26,110]
+		
+		cities = [
+					('Mainz',6),('Berlin',351),('Bilefeld',16),('Bonn',42),('Bremen',30),('Dresden',101),(u'Düsseldorf',97),
+					('Erlangen',4),('Freiburg',6),('Hamburg',260),('Hannover',66),('Heidelberg',9),('Heilbronn',21),
+					('Karlsruhe',15),('Kiel',14),('Leipzig',112),('Leverkusen',15),('Magdeburg',26),(u'München',110)
+				]
+
 		#Fill in countries into DB
 		for country in countries:
 			c = Country()
@@ -40,30 +49,25 @@ class InitController(webapp2.RequestHandler):
 				country_de = c
 		
 		#Fill in cities into DB
-		for city in cities:
+		for city,pages in cities:
 			ci = City()
 			ci.city_name = city
 			ci.country = country_de.key
 			ci.put()
 		
-		
-		cities = [u'München','Mainz','Berlin']
-		pages = [1,1,1]
-		
-		p_i = 0
-		for city in cities:
-			pages_count = pages[p_i]
-			for page in range(1,pages_count+1):
+		# Create sources
+		for city,pages in cities:
+			for page in range(1,pages):
 				source = Source()
-				source.name = 'www.topevents24.de ' + city + ' page ' + str(page) + ' of ' + str(pages_count)
-				source.display_name = 'topevents24 ' + city + ' page ' + str(page) + ' of ' + str(pages_count)
+				source.name = 'www.topevents24.de ' + city + ' page ' + str(page) + ' of ' + str(pages)
+				source.display_name = 'topevents24 ' + city + ' page ' + str(page) + ' of ' + str(pages)
 				source.url = 'http://www.topevents24.de/shop/default.asp?id=2806&start='+str(page)+'&mode=search&place='+ city
 				source.status = 'new'
 				source.parser_file = 'parser_topevent24.py'
 				source.parser_file_detail = 'parser_topevent24_detail.py'
 				source.put()
-			p_i = p_i +1
-
+		
+		logging.info('Initilization complete')
 # Define available routes
 ROUTES = [
 	webapp2.Route(r'/admin/init', handler=InitController, name='sources'),

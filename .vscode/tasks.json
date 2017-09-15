@@ -5,6 +5,7 @@
     "showOutput": "always",
     "args": [
         "/Users/andreas.santoro/google-cloud-sdk/bin/dev_appserver.py",
+        "--log_level=debug",
         "--python_startup_script=${workspaceRoot}/pydev_startup.py",
         "--automatic_restart=no",
         "--max_module_instances=default:1",

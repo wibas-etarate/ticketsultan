@@ -3,6 +3,7 @@
 from google.appengine.ext import ndb
 from google.appengine.api import search
 from source import *
+import logging
 from location import *
 import pprint
 
@@ -15,7 +16,7 @@ class Ticket(ndb.Model):
 	note = ndb.StringProperty(required=False)
 	price = ndb.FloatProperty()
 	url = ndb.StringProperty(required=False) # Where is the detail page to get
-	shop_url = ndb.StringProperty(required=False) # Where is the detail page to get	
+	shop_url = ndb.StringProperty(required=False) # The final link for buying the ticket
 	status = ndb.StringProperty(required=True, choices=['new','success','failed'])
 	source_id = ndb.IntegerProperty()
 	created = ndb.DateTimeProperty(auto_now_add=True)
@@ -23,28 +24,26 @@ class Ticket(ndb.Model):
 	
 	def _post_put_hook(self, future):
 		if self.status == 'success':
-			print ".....updating ndb model for search"
-
-			model_city = ndb.Key('City', self.city)
-			#model_country = Country.get_by_id(self.country.id())
+			model_city = self.city.get()
+			model_country = self.country.get()
 
 			try:
 				document = search.Document(
 				    doc_id = str(self.key.id()),
 				    fields=[
-				       search.TextField(name='name', value=self.name),
+				       search.TextField(name='name', value=self.name, language='de'),
 				       search.DateField(name='date', value=self.start),
-				       #search.TextField(name='city', value=model_city.city_name),
-				       #search.TextField(name='country', value=model_country.country_name),
+				       search.TextField(name='city', value=model_city.city_name, language='de'),
+				       search.TextField(name='country', value=model_country.country_name),
+					   search.NumberField(name='price', value=self.price)
 				       ])
-			except:
-				print "... Error creating the search document."
-				raise
-			
+			except Exception as e:
+				logging.error("there is an error in the search document")
+				logging.error(e)
 			try:
-			    print "search index ok"
+			    logging.debug('search index creation success')
 			    index = search.Index(name="ticketsearchindex").put(document)
-			except search.Error:
-				print "ERROR putting search index"
-				logging.exception('Put failed')
+			except Exception as e:
+				logging.error('saving of the search document failed')
+				logging.error(e)
 	

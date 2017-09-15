@@ -6,9 +6,10 @@ import os
 import urllib
 import sys
 import datetime
+import logging
 from datetime import timedelta
 
-print sys.path
+logging.debug(sys.path)
 
 sys.path.append('../ticket_sultan/backend_service')
 
@@ -35,26 +36,27 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 # Welcome Screen
 class MainController(webapp2.RequestHandler):
     def get(self):
-    	
-    	tickets = Ticket.query().order(Ticket.start)
-    	today = datetime.datetime.now()
-    	
-    	yesterday = datetime.timedelta(days=-1)
-    	tickets_today = Ticket.query(Ticket.start >= today-yesterday)
-    	tickets_today = tickets_today.filter(Ticket.start <= today)
-    	tickets_next_query = Ticket.query(Ticket.start >= today).order(Ticket.start)
-    	tickets_next = tickets_next_query.fetch(limit=4)
-    	
-    	print "... Loaded Tickets : " + str(tickets.count())
-    	
-    	
-    	template_values = {
-            'ticket_count': str(tickets.count()),
-            'tickets':tickets,
-        }
-        
-        template = JINJA_ENVIRONMENT.get_template('template_engine/homepage-1.html')
-        self.response.write(template.render(template_values))
+		tickets = Ticket.query().order()
+
+		today = datetime.datetime.now()
+		
+		yesterday = datetime.timedelta(days=-1)
+		# tickets from today
+		tickets_today = Ticket.query(Ticket.start >= today-yesterday).filter(Ticket.start <= today)
+		#tickets_today = tickets_today.filter(Ticket.start <= today)
+		# the next 4 tickets from today on
+		tickets_next = Ticket.query(Ticket.start >= today).order(Ticket.start).fetch(limit=4)
+		#tickets_next = tickets_next_query.fetch(limit=4)
+		
+		logging.info("Loaded Tickets from database " + str(tickets.count()))
+		
+		template_values = {
+			'ticket_count': str( tickets.count() ),
+			'tickets': tickets,
+		}
+		
+		template = JINJA_ENVIRONMENT.get_template('template_engine/homepage-1.html')
+		self.response.write(template.render(template_values))
 
 # Helper class for Paging
 class PageController(object):
@@ -74,7 +76,7 @@ class PageController(object):
 		self._request = request
 		
 		if self._request == None:
-			print "ERROR: You have to provide the request objext here"
+			logging.error("ERROR: You have to provide the request objext here")
 			
 	def calculate(self, search_result_query):
 		print "calculating paging"
@@ -116,7 +118,6 @@ class SearchController(webapp2.RequestHandler):
     	search_string = self.request.get('q')	
     	
     	page_controller = PageController(self.request)
-    	
     	
     	search_options = search.QueryOptions(limit = _PAGING_LIMIT_PER_PAGE, offset = page_controller.get_page_offset() )    	
     	search_query = search.Query(query_string=search_string,options=search_options)
