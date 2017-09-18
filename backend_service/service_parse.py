@@ -33,7 +33,7 @@ class TestController(webapp2.RequestHandler):
             source_id = source.key.id()
             print "SOURCE: " + str(source_id)
 
-            taskqueue.add( queue_name='sources', url='/tests/parser/parse_source/', params={'source_id': source_id} )
+            taskqueue.add( queue_name='sources', url='/admin/parser/parse_source/', params={'source_id': source_id} )
 
 
 class SourceController(webapp2.RequestHandler):

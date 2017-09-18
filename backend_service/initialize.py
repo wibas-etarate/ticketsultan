@@ -73,7 +73,7 @@ class InitController(webapp2.RequestHandler):
 				source.parser_file = 'parser_topevent24.py'
 				source.parser_file_detail = 'parser_topevent24_detail.py'
 				source.put()
-				break
+				#break
 		
 
 

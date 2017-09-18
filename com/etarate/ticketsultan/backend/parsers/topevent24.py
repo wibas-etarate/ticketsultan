@@ -97,7 +97,7 @@ class TopEvent24_Main(Parser):
                         ticket.status = 'success'
                         ticket.put()
 
-                        taskqueue.add( queue_name='priceupdates', url='/tests/parser/parse_price/', params={ 'ticket_id': str(ticket.key.id()) } )
+                        taskqueue.add( queue_name='priceupdates', url='/admin/parser/parse_price/ ', params={ 'ticket_id': str(ticket.key.id()) } )
 
             except Exception as e:
                 logging.error(e)
