@@ -66,12 +66,14 @@ class InitController(webapp2.RequestHandler):
 			for page in range(1,pages):
 				source = Source()
 				source.name = 'www.topevents24.de ' + city + ' page ' + str(page) + ' of ' + str(pages)
+				source.tec_name = 'topevents24'
 				source.display_name = 'topevents24 ' + city + ' page ' + str(page) + ' of ' + str(pages)
 				source.url = 'http://www.topevents24.de/shop/default.asp?id=2806&start='+str(page)+'&mode=search&place='+ city
 				source.status = 'new'
 				source.parser_file = 'parser_topevent24.py'
 				source.parser_file_detail = 'parser_topevent24_detail.py'
 				source.put()
+				break
 		
 
 
