@@ -25,7 +25,7 @@ class ParseController(webapp2.RequestHandler):
         print "test started"
 
         #Load Sources "matching"
-        sources = Source.query(Source.tec_name=='topevents24', Source.status=='new').fetch(limit=3)
+        sources = Source.query(Source.tec_name=='topevents24', Source.status=='new')
         logging.debug("loaded sources for topevents 24 - " + str(len(sources)))
 
         for source in sources:
