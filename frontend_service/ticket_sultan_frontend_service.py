@@ -20,8 +20,10 @@ from google.appengine.api import memcache
 
 import jinja2
 import webapp2
-from backend_service.ticket import *
-from backend_service.location import *
+
+from com.etarate.ticketsultan.backend.source import *
+from com.etarate.ticketsultan.backend.ticket import *
+from com.etarate.ticketsultan.backend.location import *
 
 
 

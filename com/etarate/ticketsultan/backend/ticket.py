@@ -23,7 +23,7 @@ class Ticket(ndb.Model):
 	updated = ndb.DateTimeProperty(auto_now=True)
 	
 	def _post_put_hook(self, future):
-		build_search_index(self)
+		self.build_search_index()
 		
 	def build_search_index(self):
 		if self.status == 'success':
@@ -33,7 +33,6 @@ class Ticket(ndb.Model):
 
 			try:
 				document = search.Document(
-					doc_id = str(self.key.id()),
 					fields=[
 					search.TextField(name='name', value=self.name, language='de'),
 					search.DateField(name='date', value=self.start),
@@ -50,3 +49,9 @@ class Ticket(ndb.Model):
 			except Exception as e:
 				logging.error('saving of the search document failed')
 				logging.error(e)
+
+
+# the ticket	
+class Ticket_Category(ndb.Model):
+	name = ndb.StringProperty(required=True)
+	

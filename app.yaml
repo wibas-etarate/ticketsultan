@@ -53,6 +53,10 @@ handlers:
 - url: /.*
   script: frontend_service.ticket_sultan_frontend_service.app 
 
+# TEST URLS
+- url: /tests/parser
+  script: tests.parsertest.app
+  login: admin
 
 libraries:
 - name: jinja2

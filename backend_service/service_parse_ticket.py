@@ -12,9 +12,9 @@ import webapp2
 from lxml import html, etree
 from lxml.html.clean import Cleaner
 
-from ticket import *
-from source import *
-from location import *
+from com.etarate.ticketsultan.backend.source import *
+from com.etarate.ticketsultan.backend.ticket import *
+from com.etarate.ticketsultan.backend.location import *
 
 from google.appengine.api import urlfetch
 from google.appengine.api import taskqueue
