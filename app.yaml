@@ -21,9 +21,9 @@ handlers:
 - url: /admin/parser/parse_source/.*
   script: backend_service.service_parse.app
 - url: /admin/parser/parse_price/.*
-  script: backend_service.parse_source.app
+  script: backend_service.service_parse.app
 - url: /admin/parser/.*
-  script: backend_service.parse_source.app 
+  script: backend_service.service_parse.app 
 
 
 - url: /admin/init
