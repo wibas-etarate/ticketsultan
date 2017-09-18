@@ -19,55 +19,78 @@ from google.appengine.api import taskqueue
 
 JINJA_ENVIRONMENT = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),extensions=['jinja2.ext.autoescape'],autoescape=True)
 
-class Parser(Object):
+class Parser(object):
+    #The current source we are working in
     source = None
-    source_current = None
+    ticket = None
     cleaner = None
 
     website_content = None
-    html_tree = None
-
-    def __init__(self, source_id):
-        self.sources = Source().key()
-        self.__source_i = 0
-        self.cleaner = Cleaner(style=True, links=True, add_nofollow=True, page_structure=False, safe_attrs_only=False)	
-		urlfetch.set_default_fetch_deadline(60)
-
-    def next_source(self):
-        self.__source_i = self.__source_i + 1
-        self.source_current = self.sources[__source_i]
-
-        return self.source_current
+    html_tree = None        
     
-    def pre_parse(self):
-        pass
+    def parse(self, source_id):
+        logging.info('Parsing with ID ' + str(source_id))
+        
+        self.source = Source().get_by_id( int(source_id) )
 
-    def parse(self):
-        execfile('./backend_service/parsers/'+self.source_current.parser_file)
-
-    def post_parse(self):
+        logging.info('parser setup and loaded ' + str(self.source.key.id()))
+        
+        self.request_external_page(self.source.url)
         pass
 
     def get_source(self):
         return self.source_current
-
-    def success(self):
-        self.source_current.status = 'success'
-        self.source_current.put()
-
-    def failed(self):
-        self.source_current.status = 'failed'
-        self.source_current.put()
     
-    def request_external_page(self):
-        website = urlfetch.fetch(self.source_current.source.url)
-        self.website_content = str(website.content)
+    #This method need to stay explicit to be capable to update the current price at any time
+    def parse_price(self, ticket_id):
+        self.ticket = Ticket().get_by_id( int(ticket_id) )
+        self.request_external_page( self.ticket.url )
 
-        # Parses the HTML
-		self.html_tree = html.fromstring(page)
+        pass
 
+    def clean_html(self, clean_string):
+        result = clean_string.replace('<div>','').replace('</div>','')
+        try:
+            result = result.encode('utf-8').decode('iso-8859-1')
+        except:
+            print "failed to encode"
+        result = result.strip()
+        return str(result)
 
-    def clean_page(self):
+    def request_external_page(self, parse_url, clean=True, encoding="iso-8859-1"):
+        #logging.info('Requesting external site ' + str(parse_url.encode('utf-8').decode(encoding)) )
+        self.cleaner = Cleaner(style=True, links=True, add_nofollow=True, page_structure=False, safe_attrs_only=False)
+        urlfetch.set_default_fetch_deadline(60) #60 is the max allowed for tasks in google cloud.
+
+        try:
+            http_headers={'Accept-Charset': 'utf-8;q=0.7,*;q=0.7',}
+            
+            print type(parse_url)
+            print parse_url
+            parse_url_encoded = parse_url.decode('utf-8').encode(encoding)
+
+            logging.info(parse_url_encoded)
+
+            website = urlfetch.fetch(url=parse_url_encoded, headers=http_headers )
+            
+            self.website_content = str(website.content)
+            
+            # Parses the HTML
+
+            if clean:
+                logging.info("returning page cleanded")
+                #html_cleaned = self.clean_html(self.website_content)
+                html_cleaned = self.website_content
+                self.html_tree = html.fromstring(self.cleaner.clean_html( html_cleaned ))
+                logging.debug( str(website.content) )
+            else:
+                self.html_tree = html.fromstring(self.website_content)
+                logging.debug( str(website.content) )
+
+            
+        except Exception as e:
+            logging.error("Loading of external page failed")
+            logging.error(e)
 
     
 

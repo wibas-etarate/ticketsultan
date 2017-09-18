@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 class Source(ndb.Model):
 	name = ndb.StringProperty(required=True)
 	display_name = ndb.StringProperty(required=True)
+	tec_name = ndb.StringProperty(required=True)
 	url = ndb.StringProperty(required=True)
 	status = ndb.StringProperty(required=True, choices=['new','collected','parse','success','failed'])
 	parser_file = ndb.StringProperty(required=True)
