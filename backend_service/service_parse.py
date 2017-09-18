@@ -20,7 +20,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 
 # Welcome Screen
-class TestController(webapp2.RequestHandler):
+class ParseController(webapp2.RequestHandler):
     def get(self):
         print "test started"
 
@@ -60,9 +60,9 @@ class PriceController(webapp2.RequestHandler):
 
 # Define available routes
 ROUTES = [
-	webapp2.Route(r'/tests/parser/', handler=TestController, name='testing'),
-    webapp2.Route(r'/tests/parser/parse_source/', handler=SourceController, name='source'),
-    webapp2.Route(r'/tests/parser/parse_price/', handler=PriceController, name='price'),
+	webapp2.Route(r'/admin/parser/', handler=ParseController, name='parse'),
+    webapp2.Route(r'/admin/parser/parse_source/', handler=SourceController, name='source'),
+    webapp2.Route(r'/admin/parser/parse_price/', handler=PriceController, name='price'),
 ]
 
 app = webapp2.WSGIApplication(ROUTES, debug=True)
