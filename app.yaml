@@ -18,19 +18,17 @@ handlers:
 - url: /admin/pages
   static_dir: backend_service/views/adminUI/pages
 
-# Service for parsing sources and create tickets
-- url: /admin/parse_source
+- url: /admin/parser/parse_source/.*
   script: backend_service.service_parse.app
-  
-# Service for parsing and updating the ticket in detail
-- url: /admin/parse_ticket
-  script: backend_service.service_parse_ticket.app
-  login: admin
-  
+- url: /admin/parser/parse_price/.*
+  script: backend_service.parse_source.app
+- url: /admin/parser/.*
+  script: backend_service.parse_source.app 
+
+
 - url: /admin/init
   script: backend_service.initialize.app
 - url: /admin/init_search
-
   script: backend_service.initialize.app
 - url: /admin/.*
   script: backend_service.service_backend.app 
