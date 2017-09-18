@@ -2,9 +2,9 @@
 #!/usr/bin/env python
 import webapp2
 from google.appengine.api import taskqueue
-from source import *
-from ticket import *
-from location import *
+from com.etarate.ticketsultan.backend.source import *
+from com.etarate.ticketsultan.backend.ticket import *
+from com.etarate.ticketsultan.backend.location import *
 import logging
 
 from google.appengine.ext import ndb

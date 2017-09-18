@@ -10,8 +10,9 @@ from google.appengine.ext import ndb
 import jinja2
 import webapp2
 
-from ticket import *
-from source import *
+from com.etarate.ticketsultan.backend.source import *
+from com.etarate.ticketsultan.backend.ticket import *
+from com.etarate.ticketsultan.backend.location import *
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),

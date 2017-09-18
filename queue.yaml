@@ -3,3 +3,7 @@ queue:
 - name: default
   rate: 2/s
   bucket_size: 10
+
+- name: sources
+  rate: 1/s
+  bucket_size: 10

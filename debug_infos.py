@@ -1,7 +1,9 @@
 import sys
 #import jinja2
 import webapp2
-from backend_service.ticket import *
+from com.etarate.ticketsultan.backend.source import *
+from com.etarate.ticketsultan.backend.ticket import *
+from com.etarate.ticketsultan.backend.location import *
 
 class DebugController(webapp2.RequestHandler):
     def get(self):
