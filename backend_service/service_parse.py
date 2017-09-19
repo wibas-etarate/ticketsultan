@@ -54,8 +54,8 @@ class PriceController(webapp2.RequestHandler):
         ticket_id = str(self.request.get('ticket_id'))
         print "PRICE CONTROL START - TICKET: " + str(ticket_id)
         
-        parser_topevent24 = TopEvent24_Main()
-        parser_topevent24.parse_price(ticket_id)
+        #parser_topevent24 = TopEvent24_Main()
+        #parser_topevent24.parse_price(ticket_id)
 
     def get(self):
         logging.warning("EXECUTED AS GET This service need to be called as post")
@@ -66,7 +66,8 @@ class CronJobController(webapp2.RequestHandler):
         tickets = Ticket().query(Ticket.status=='success')
 
         for ticket in tickets:
-            taskqueue.add( queue_name='priceupdates', url='/admin/parser/parse_price/ ', params={ 'ticket_id': str(ticket.key.id()) } )
+            pass
+            #taskqueue.add( queue_name='priceupdates', url='/admin/parser/parse_price/ ', params={ 'ticket_id': str(ticket.key.id()) } )
 
 
 
