@@ -34,6 +34,8 @@ class ParseController(webapp2.RequestHandler):
             print "SOURCE: " + str(source_id)
 
             taskqueue.add( queue_name='sources', url='/admin/parser/parse_source/', params={'source_id': source_id} )
+            source.status = 'parse' # avoid adding the same elements multiple times
+            source.put()
 
 
 class SourceController(webapp2.RequestHandler):
@@ -58,11 +60,22 @@ class PriceController(webapp2.RequestHandler):
     def get(self):
         logging.warning("EXECUTED AS GET This service need to be called as post")
 
+
+class CronJobController(webapp2.RequestHandler):
+    def post(self):
+        tickets = Ticket().query(Ticket.status=='success')
+
+        for ticket in tickets:
+            taskqueue.add( queue_name='priceupdates', url='/admin/parser/parse_price/ ', params={ 'ticket_id': str(ticket.key.id()) } )
+
+
+
 # Define available routes
 ROUTES = [
 	webapp2.Route(r'/admin/parser/', handler=ParseController, name='parse'),
     webapp2.Route(r'/admin/parser/parse_source/', handler=SourceController, name='source'),
     webapp2.Route(r'/admin/parser/parse_price/', handler=PriceController, name='price'),
-]
+    ebapp2.Route(r'/admin/parser/cron/', handler=CronJobController, name='cron'),
+]/
 
 app = webapp2.WSGIApplication(ROUTES, debug=True)

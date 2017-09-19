@@ -29,23 +29,27 @@ class Parser(object):
     html_tree = None        
     
     def parse(self, source_id):
-        logging.info('Parsing with ID ' + str(source_id))
-        
-        self.source = Source().get_by_id( int(source_id) )
+        if source_id is not None:
+            _source_id = int(source_id)
 
-        logging.info('parser setup and loaded ' + str(self.source.key.id()))
-        
-        self.request_external_page(self.source.url)
-        pass
+            logging.info('Parsing with ID ' + str(_source_id))
+            self.source = Source().get_by_id( _source_id )
 
+            if self.source is None:
+                logging.error('Source is none, nothing loaded... aborting parsing')
+            else:
+                logging.info('parser setup and loaded ' + str(_source_id))
+                self.request_external_page(self.source.url)
+        else:
+            logging.warning('Source id does not exist')
+    
     def get_source(self):
         return self.source_current
     
     #This method need to stay explicit to be capable to update the current price at any time
     def parse_price(self, ticket_id):
-        self.ticket = Ticket().get_by_id( int(ticket_id) )
-        self.request_external_page( self.ticket.url )
-
+        #self.ticket = Ticket().get_by_id( int(ticket_id) )
+        #self.request_external_page( self.ticket.url )
         pass
 
     def clean_html(self, clean_string):
@@ -64,9 +68,6 @@ class Parser(object):
 
         try:
             http_headers={'Accept-Charset': 'utf-8;q=0.7,*;q=0.7',}
-            
-            print type(parse_url)
-            print parse_url
             parse_url_encoded = parse_url.decode('utf-8').encode(encoding)
 
             logging.info(parse_url_encoded)
@@ -76,7 +77,6 @@ class Parser(object):
             self.website_content = str(website.content)
             
             # Parses the HTML
-
             if clean:
                 logging.info("returning page cleanded")
                 #html_cleaned = self.clean_html(self.website_content)
@@ -86,11 +86,7 @@ class Parser(object):
             else:
                 self.html_tree = html.fromstring(self.website_content)
                 logging.debug( str(website.content) )
-
-            
+      
         except Exception as e:
             logging.error("Loading of external page failed")
             logging.error(e)
-
-    
-

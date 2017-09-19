@@ -25,6 +25,7 @@ class TopEvent24_Main(Parser):
     def parse(self, source_id):
         super(TopEvent24_Main, self).parse(source_id)
 
+        
         #Find the contend Element in the Page (contains the tables with the links to pages)
         content_part = self.html_tree.find(".//div[@id='content']")
         #Parse all tables to be able to loop over (the page looks different all the time )
@@ -102,7 +103,7 @@ class TopEvent24_Main(Parser):
             except Exception as e:
                 logging.error(e)
                 try:
-                    ticket.status = 'failed'
+                    #ticket.status = 'failed'
                     ticket.put()
                 except:
                     pass

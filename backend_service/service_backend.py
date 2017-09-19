@@ -19,16 +19,23 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
+
 # Welcome Screen
 class MainController(webapp2.RequestHandler):
     def get(self):
-    	print "BACKEND"
-    	template_values = {
-            'title': 'Welcome to TicketSultan Admin UI',
-        }
-
-        template = JINJA_ENVIRONMENT.get_template('views/main.html')
-        self.response.write(template.render(template_values))
+		
+		source_info = dict(Source().get_source_status())
+		logging.info(source_info)
+		
+		template_values = {
+			'title': 'Welcome to TicketSultan Admin UI',
+			'count_success':  source_info['success'],
+			'count_failed': source_info['failed'],
+			'count_total': source_info['total'],
+			}
+		
+		template = JINJA_ENVIRONMENT.get_template('views/main.html')
+		self.response.write(template.render(template_values))
 
 # Sources Management    	
 class SourceController(webapp2.RequestHandler):

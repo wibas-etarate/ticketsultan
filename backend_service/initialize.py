@@ -1,13 +1,22 @@
 # encoding: utf-8
 #!/usr/bin/env python
+import os
+import jinja2
 import webapp2
 from google.appengine.api import taskqueue
+from google.appengine.api import memcache
 from com.etarate.ticketsultan.backend.source import *
 from com.etarate.ticketsultan.backend.ticket import *
 from com.etarate.ticketsultan.backend.location import *
 import logging
 
 from google.appengine.ext import ndb
+
+
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
 
 class SearchUpdateController(webapp2.RequestHandler):
 	def get(self):
@@ -19,10 +28,16 @@ class SearchUpdateController(webapp2.RequestHandler):
 class InitController(webapp2.RequestHandler):
 	def get(self):
 		# Purge Task Queue
-		q = taskqueue.Queue('default')
-		q.purge()
-		logging.info('initializing... queue purged')
-		
+		taskqueue.Queue('default').purge()
+		taskqueue.Queue('sources').purge()
+		taskqueue.Queue('tickets').purge()
+		taskqueue.Queue('priceupdates').purge()
+
+		logging.info('taksqueues purged')
+
+		memcache.flush_all()
+		logging.info('memcache flushed')
+
 		# Delete existing entities:
 		ndb.delete_multi(Source.query().fetch(keys_only=True))
 		logging.debug('.. deleted Sources')
@@ -53,7 +68,9 @@ class InitController(webapp2.RequestHandler):
 			
 			if c.country_name == 'Deutschland':
 				country_de = c
-		
+
+		logging.info('countries created')
+
 		#Fill in cities into DB
 		for city,pages in cities:
 			ci = City()
@@ -61,7 +78,10 @@ class InitController(webapp2.RequestHandler):
 			ci.country = country_de.key
 			ci.put()
 		
+		logging.info('cities created')
+		
 		# Create sources for
+		source_entities = []
 		for city,pages in cities:
 			for page in range(1,pages):
 				source = Source()
@@ -72,12 +92,21 @@ class InitController(webapp2.RequestHandler):
 				source.status = 'new'
 				source.parser_file = 'parser_topevent24.py'
 				source.parser_file_detail = 'parser_topevent24_detail.py'
-				source.put()
+				source_entities.append(source)
+				logging.info('source created ... ' + source.name)
 				#break
 		
+		logging.info('sources save ... ')
+		ndb.put_multi(source_entities)
+		logging.info('sources save success ')
 
+		template_values = {
+			'title': 'Initialization',
+			'content': 'Initialization of the database is complete',
+		}
+		template = JINJA_ENVIRONMENT.get_template('views/main.html')
+		self.response.write(template.render(template_values))
 
-		logging.info('Initilization complete')
 # Define available routes
 ROUTES = [
 	webapp2.Route(r'/admin/init', handler=InitController, name='sources'),
