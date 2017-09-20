@@ -38,7 +38,7 @@ ticketsultan is a testproject for playing with google cloud services
 - take the configuration files from .vscode
 - change the configuration to your needs
 
-###tasks.json
+### tasks.json
    
    {
     "version": "0.1.0",
@@ -54,6 +54,6 @@ ticketsultan is a testproject for playing with google cloud services
         "--max_module_instances=default:1",
         "${workspaceRoot}/app.yaml"
     ]
-}
+    }
 
 
