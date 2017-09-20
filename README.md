@@ -54,6 +54,6 @@ ticketsultan is a testproject for playing with google cloud services
         "--max_module_instances=default:1",
         "${workspaceRoot}/app.yaml"
     ]
-    }```
+    }
 
 
