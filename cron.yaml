@@ -1,4 +1,4 @@
 cron: 
 - description: fetch data
-  url: /admin/jobs/cron
+  url: /admin/parser/cron
   schedule: every 20 mins

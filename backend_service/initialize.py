@@ -94,15 +94,20 @@ class InitController(webapp2.RequestHandler):
 				source.parser_file_detail = 'parser_topevent24_detail.py'
 				source_entities.append(source)
 				logging.info('source created ... ' + source.name)
-				#break
+				break
 		
 		logging.info('sources save ... ')
 		ndb.put_multi(source_entities)
 		logging.info('sources save success ')
 
+		source_info = dict(Source().get_source_status())
+
 		template_values = {
 			'title': 'Initialization',
 			'content': 'Initialization of the database is complete',
+			'count_success':  source_info['success'],
+			'count_failed': source_info['failed'],
+			'count_total': source_info['total'],
 		}
 		template = JINJA_ENVIRONMENT.get_template('views/main.html')
 		self.response.write(template.render(template_values))

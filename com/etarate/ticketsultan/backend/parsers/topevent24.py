@@ -25,9 +25,16 @@ class TopEvent24_Main(Parser):
     def parse(self, source_id):
         super(TopEvent24_Main, self).parse(source_id)
 
-        
+
         #Find the contend Element in the Page (contains the tables with the links to pages)
-        content_part = self.html_tree.find(".//div[@id='content']")
+        try:
+            content_part = self.html_tree.find(".//div[@id='content']")
+        except AttributeError as e:
+            logging.warning('this source had some issues. No content arrived')
+            logging.warning(e)
+            return
+
+
         #Parse all tables to be able to loop over (the page looks different all the time )
         content_part_tr = content_part.findall(".//table")
         logging.debug(content_part_tr)
@@ -98,7 +105,7 @@ class TopEvent24_Main(Parser):
                         ticket.status = 'success'
                         ticket.put()
 
-                        taskqueue.add( queue_name='priceupdates', url='/admin/parser/parse_price/ ', params={ 'ticket_id': str(ticket.key.id()) } )
+                        taskqueue.add( queue_name='priceupdates', url='/admin/parser/parse_price/', params={ 'ticket_id': str(ticket.key.id()) } )
 
             except Exception as e:
                 logging.error(e)
@@ -110,20 +117,41 @@ class TopEvent24_Main(Parser):
 
     def parse_price(self, ticket_id):
         super(TopEvent24_Main, self).parse_price(ticket_id)
-
-        #Find the contend Element in the Page (contains the tables with the links to pages)
         
         logging.info('Parsing Price')
-        logging.info(self.html_tree)
-        content_part = self.html_tree.find(".//form[@name='pricelist']")
+        #content_part = self.html_tree.find('.//form[@action="hopper.asp"]')
+
+        forms = self.html_tree.findall('.//form')
+
+        for form in forms:
+            print form.action
+
+
+
+        
+        #matches = re.findall('<form>(.*?)</form>', body, re.DOTALL)
+        
+
+        #match_pricetable = re.findall(r'<form.action..hopper.*?>(.*)form>', body, re.DOTALL)	
+        
+        print ""
+        print ""
+        print ""
+        print "-----------------------------------------------------------------------------------------------------------------------"
+        print "-----------------------------------------------------------------------------------------------------------------------"
+        print forms
+        print "-----------------------------------------------------------------------------------------------------------------------"
+        print "-----------------------------------------------------------------------------------------------------------------------"
+        print "-----------------------------------------------------------------------------------------------------------------------"
 
         logging.info('Parsing Content')
 
-        logging.info(content_part)
+        #logging.info(content_part)
 
         #Parse all tables to be able to loop over (the page looks different all the time )
-        content_part_tr = content_part.findall(".//tr")
+        #content_part_tr = content_part.findall(".//tr")
 
+        return
 
         print "-----------------------"
         for tr in content_part_tr:

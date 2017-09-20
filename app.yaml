@@ -3,6 +3,9 @@ api_version: 1
 threadsafe: false
 
 handlers: 
+- url: /test
+  script: tests.test.app
+
 - url: /debug
   script: debug_infos.app
 
@@ -18,9 +21,23 @@ handlers:
 - url: /admin/pages
   static_dir: backend_service/views/adminUI/pages
 
+- url: /admin/parser/bower_components
+  static_dir: backend_service/views/adminUI/bower_components
+
+- url: /admin/parser/plugins
+  static_dir: backend_service/views/adminUI/plugins
+
+- url: /admin/parser/dist
+  static_dir: backend_service/views/adminUI/dist
+
+- url: /admin/parser/pages
+  static_dir: backend_service/views/adminUI/pages
+
 - url: /admin/parser/parse_source/.*
   script: backend_service.service_parse.app
 - url: /admin/parser/parse_price/.*
+  script: backend_service.service_parse.app
+- url: /admin/parser/cron/.*
   script: backend_service.service_parse.app
 - url: /admin/parser/.*
   script: backend_service.service_parse.app 
