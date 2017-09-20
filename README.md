@@ -19,9 +19,9 @@ ticketsultan is a testproject for playing with google cloud services
  ### Backend
     /admin/					#Admin UI
     /admin/sources/				#View and edit sources
-    /admin/init					#Preinitialization
+    /admin/init				#Preinitialization
     /admin/parser/				#Parse sources
-    /admin/parser/cron				#CRON Jobs
+    /admin/parser/cron			#CRON Jobs
   ### Frontend
     /						#Frontend
     /search/					#Search Details
