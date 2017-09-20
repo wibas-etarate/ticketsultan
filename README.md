@@ -2,7 +2,7 @@
 
 ticketsultan is a testproject for playing with google cloud services
 
-You will find..
+#### You will find..
 - many bugs
 - a lot of useless stuff
 - undocumented parts
@@ -16,11 +16,23 @@ You will find..
 	dev_appserver.py app.yaml
 
 ## Importand Endpoints
+ ### Backend
     /admin/					#Admin UI
-	/admin/init				#Preinitialization
-	/admin/parse/			#Parse sources
-	/						#Frontend
+    /admin/sources/				#View and edit sources
+    /admin/init					#Preinitialization
+    /admin/parser/				#Parse sources
+    /admin/parser/cron				#CRON Jobs
+  ### Frontend
+    /						#Frontend
+    /search/					#Search Details
 
 
 ## Deployment to google cloud
     gcloud app deploy app.yaml queue.yaml cron.yaml
+
+## Run it local
+    dev_appserver.py app.yaml
+    
+## Run it with Visual Studio Code
+- install Visual Studio Code
+
