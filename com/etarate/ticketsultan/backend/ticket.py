@@ -22,7 +22,7 @@ class Ticket(ndb.Model):
     updated = ndb.DateTimeProperty(auto_now=True)
 
     @property
-    def get_best_price(self):
+    def get_best_price_value(self):
         """
         gets the best price for a ticket or 0
         :return: float best price
@@ -75,7 +75,7 @@ class Ticket(ndb.Model):
             model_city = self.city.get()
             model_country = self.country.get()
 
-            best_price = self.get_best_price
+            best_price = self.get_best_price_value
 
             try:
                 document = search.Document(doc_id=str(self.key.id()),

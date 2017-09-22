@@ -126,8 +126,25 @@ class TopEvent24Main(Parser):
 
         logging.info('Parsing Price')
         html_form = self.html_tree.find('.//form[@action="hopper.asp"]')
+
+        if html_form is None:
+            self.ticket.status = 'failed'
+            self.ticket.put()
+            return
+
         html_table = html_form.find('.//table')
+
+        if html_table is None:
+            self.ticket.status = 'failed'
+            self.ticket.put()
+            return
+
         html_rows = html_table.findall('.//tr')
+
+        if html_rows is None:
+            self.ticket.status = 'failed'
+            self.ticket.put()
+            return
 
         for tr in html_rows:
             if tr.attrib['class'] == 'thead':  # we ignore the head

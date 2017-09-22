@@ -155,15 +155,23 @@ class SearchController(webapp2.RequestHandler):
         # clean searchstring
         search_string = search_string.strip()
 
-        search_options = search.QueryOptions(limit=_PAGING_LIMIT_PER_PAGE, offset=page_controller.get_page_offset())
+        offset = page_controller.get_page_offset()
+
+        search_options = search.QueryOptions(limit=_PAGING_LIMIT_PER_PAGE, ids_only=True, offset=offset)
         search_query = search.Query(query_string=search_string, options=search_options)
         search_results = search.Index(name='ticketsearchindex').search(query=search_query)
 
+        result_ids = []
+        for result in search_results.results:
+            t_key = ndb.Key(Ticket, int(result.doc_id))
+            result_ids.append(t_key)
+
+        tickets = ndb.get_multi(result_ids)
+
         logging.info('generated search string: ' + search_string)
 
-
         template_values = {
-            'tickets': search_results,
+            'tickets': tickets,
             'ticket_count': search_results.number_found,
             'ticket_show': len(search_results.results),
             'paging': page_controller,

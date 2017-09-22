@@ -240,25 +240,25 @@
 						<div class="search-result-item">
 							<div class="row">
 								<div class="search-result-item-info col-sm-9">
-									<h3>{{ ticket.fields[0].value }}</h3>
+									<h3>{{ ticket.city.get().city_name }} : {{ ticket.name }}</h3>
 									<ul class="row">
 										<li class="col-sm-5 col-lg-6">
 											<span>Venue</span>
-											{{ ticket.fields[2].value }}
+											{{ ticket.city.get().city_name }}
 										</li>
 										<li class="col-sm-4 col-lg-3">
-											<span>Saturday</span>
-											{{ ticket.fields[1].value }}
+											<span>{{ ticket.start.strftime('%A') }}</span>
+											{{ ticket.start.strftime('%d.%m') }}
 										</li>
 										<li class="col-sm-3">
 											<span>Time</span>
-											(hama noch net)
+											{{ ticket.start.strftime('%H:%M') }}
 										</li>
 									</ul>
 								</div>
 								<div class="search-result-item-price col-sm-3">
-									<span>Price</span>
-									<strong>0 €</strong>
+									<span>Price from</span>
+									<strong>{{ ticket.get_best_price_value }} €</strong>
 									<a href="#">Book Now</a>
 								</div>
 							</div>

@@ -78,7 +78,7 @@ class CronJobController(webapp2.RequestHandler):
 
         for ticket in tickets:
             taskqueue.add(queue_name='priceupdates', url='/admin/parser/parse_price/',
-                          params={'ticket_id': str(ticket.key.id())})
+                          params={'ticket_id': str(ticket.id())})
 
     def get(self):
         logging.info('starting cron as test')
@@ -86,7 +86,7 @@ class CronJobController(webapp2.RequestHandler):
 
         for ticket in tickets:
             taskqueue.add(queue_name='priceupdates', url='/admin/parser/parse_price/',
-                          params={'ticket_id': str(ticket.key.id())})
+                          params={'ticket_id': str(ticket.id())})
 
 
 # Define available routes

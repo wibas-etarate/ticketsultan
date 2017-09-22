@@ -119,6 +119,14 @@ class Parser(object):
                 time_delta = timer_end - timer
                 time_delta = int(time_delta.total_seconds() * 1000)
                 logging.info('page request took :' + str(time_delta) + ' miliseconds')
+
+
+                if time_delta >= 35000: # If pressure is to high, slow down
+                    pass
+                    # TODO return an error and handle a slow down with page requests
+                    logging.warning('Fetch took > 35 seconds. We will slow down in the future the page requests.')
+
+
             except DeadlineExceededError as e:
                 logging.warning('The website took to long to respond. try again')
                 raise e
