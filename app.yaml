@@ -79,6 +79,9 @@ handlers:
 - url: /.*
   script: frontend_service.ticket_sultan_frontend_service.app 
 
+skip_files:
+- ticketsultan.datastore
+
 libraries:
 - name: jinja2
   version: latest

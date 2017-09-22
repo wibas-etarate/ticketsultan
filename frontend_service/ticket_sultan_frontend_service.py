@@ -38,12 +38,10 @@ class MainController(webapp2.RequestHandler):
         # Cache the Ticket count (so only first access is slow)
         ticket_count = memcache.get('ticket_count')
         if ticket_count is None:
-            logging.info("writing ticket count to memcache")
-            ticket_option = ndb.QueryOptions(keys_only=True)
-            tickets = Ticket.query().fetch(options=ticket_option)
-            ticket_count = len(tickets)
+            ticket_count_result = Ticket.query().count_async()
+            ticket_count = ticket_count_result.get_result()
 
-            memcache.add('ticket_count', ticket_count, 3600)
+            memcache.add('ticket_count', ticket_count, 300)
 
         today = datetime.datetime.now()
 
@@ -54,14 +52,14 @@ class MainController(webapp2.RequestHandler):
         if tickets_today is None:
             logging.info("writing todays tickets to memcache")
             tickets_today = Ticket.query(Ticket.start >= today - yesterday).filter(Ticket.start <= today)
-            memcache.add('tickets_today', tickets_today, 360)
+            memcache.add('tickets_today', tickets_today, 600)
 
         # the next 4 tickets from today on
         tickets_next = memcache.get('tickets-net')
         if tickets_next is None:
             logging.info("writing next tickets to memcache")
             tickets_next = Ticket.query(Ticket.start >= today).order(Ticket.start).fetch(limit=4)
-            memcache.add('tickets_next', tickets_next, 120)
+            memcache.add('tickets_next', tickets_next, 600)
 
         # tickets_next = tickets_next_query.fetch(limit=4)
 
@@ -161,9 +159,8 @@ class SearchController(webapp2.RequestHandler):
         search_query = search.Query(query_string=search_string, options=search_options)
         search_results = search.Index(name='ticketsearchindex').search(query=search_query)
 
-        logging.info('generated search string: ' + str(search_string))
+        logging.info('generated search string: ' + search_string)
 
-        page_infos = page_controller.calculate(search_results)
 
         template_values = {
             'tickets': search_results,

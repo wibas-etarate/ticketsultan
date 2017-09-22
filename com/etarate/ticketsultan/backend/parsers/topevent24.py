@@ -22,9 +22,9 @@ from com.etarate.ticketsultan.backend.ticket import *
 from com.etarate.ticketsultan.backend.location import *
 
 
-class TopEvent24_Main(Parser):
+class TopEvent24Main(Parser):
     def parse(self, source_id):
-        super(TopEvent24_Main, self).parse(source_id)
+        super(TopEvent24Main, self).parse(source_id)
 
         # Find the contend Element in the Page (contains the tables with the links to pages)
         try:
@@ -63,8 +63,10 @@ class TopEvent24_Main(Parser):
 
                         logging.debug("clean URL: " + str(clean_url))
 
+                        # A bit dirty/lazy, but parsing the URL Params and blow the resulting
+                        # touples into a dictionary
                         parsed_url_params = dict(urlparse.parse_qsl(
-                            clean_url))  # A bit dirty/lazy, but parsing the URL Params and blow the resulting touples into a dictionary
+                            clean_url))
 
                         ticket_name = parsed_url_params['title'].replace('_', ' ')
                         ticket_date = datetime.strptime(parsed_url_params['date'], '%d.%m.%y')
@@ -96,18 +98,17 @@ class TopEvent24_Main(Parser):
                         ticket = Ticket()
                         ticket.url = "http://www.topevents24.de/shop/" + str(clean_url)
                         ticket.name = ticket_name
-                        ticket.price = int(0)
                         ticket.start = ticket_date
                         ticket.note = ticket_note.replace('_', ' ')
                         ticket.city = ticket_city_db.key
                         ticket.country = Country.query(Country.country_name == 'Deutschland').get().key
-                        ticket.source_id = self.source.key.id()
+                        ticket.source = self.source.key
 
                         ticket.status = 'success'
                         ticket.put()
 
-                        taskqueue.add(queue_name='priceupdates', url='/admin/parser/parse_price/',
-                                      params={'ticket_id': str(ticket.key.id())})
+                        # taskqueue.add(queue_name='priceupdates', url='/admin/parser/parse_price/',
+                        #              params={'ticket_id': str(ticket.key.id())})
 
             except Exception as e:
                 logging.error(e)
@@ -118,7 +119,10 @@ class TopEvent24_Main(Parser):
                     pass
 
     def parse_price(self, ticket_id):
-        super(TopEvent24_Main, self).parse_price(ticket_id)
+        super(TopEvent24Main, self).parse_price(ticket_id)
+
+        # delete prices in current ticket
+        self.ticket.drop_prices()
 
         logging.info('Parsing Price')
         html_form = self.html_tree.find('.//form[@action="hopper.asp"]')
@@ -126,65 +130,45 @@ class TopEvent24_Main(Parser):
         html_rows = html_table.findall('.//tr')
 
         for tr in html_rows:
-            if tr.attrib['class'] == 'thead': # we ignore the head
+            if tr.attrib['class'] == 'thead':  # we ignore the head
                 pass
             else:
-                html_subtable = tr.find('.//table') # check if there are some cards to buy available
+                html_subtable = tr.find('.//table')  # check if there are some cards to buy available
 
-                if html_subtable is not None: # Yes we have cards to buy
-                    print "found table"
+                if html_subtable is not None:  # Yes we have cards to buy
                     html_subtable_rows = html_subtable.findall('.//tr')
 
-                    # Cards to buy are in a table with 3 trs
-                    content_row = html_subtable_rows[1]
-                    content_tds = content_row.findall('.//td')
+                    rows = len(html_subtable_rows)
 
-                    ticket_category = content_tds[0].text
-                    ticket_currency = content_tds[4].text
-                    ticket_price = float( content_tds[5].text.replace(',','.') )
+                    if rows == 2:  # Not bookable
+                        self.ticket.add_price(1, float(0.0), 'not available')
+                    elif rows >= 3:
+                        # Cards to buy are in a table with 3 trs
+                        content_row = html_subtable_rows[1]
+                        content_tds = content_row.findall('.//td')
 
+                        ticket_category = content_tds[0].text
 
+                        ticket_id = 5
+                        if ticket_category == 'Kat.1':
+                            ticket_id = 1
+                        elif ticket_category == 'Kat.2':
+                            ticket_id = 2
+                        elif ticket_category == 'Kat.3':
+                            ticket_id = 3
+                        elif ticket_category == 'Kat.4':
+                            ticket_id = 4
 
+                        ticket_currency = content_tds[4].text
+                        ticket_price = float(content_tds[5].text.replace(',', '.'))
 
-        print html_table
-        #for form in forms:
-        #    print form.action
+                        self.ticket.add_price(ticket_id, ticket_price, 'available')
+                    else:
+                        logging.warning('Ticket Price cols do not match filter, CHECK IT BABY!')
 
-        # matches = re.findall('<form>(.*?)</form>', body, re.DOTALL)
-
-
-        # match_pricetable = re.findall(r'<form.action..hopper.*?>(.*)form>', body, re.DOTALL)
-
-        print ""
-        print ""
-        print ""
-        print "-----------------------------------------------------------------------------------------------------------------------"
-        print "-----------------------------------------------------------------------------------------------------------------------"
-        print forms
-        print "-----------------------------------------------------------------------------------------------------------------------"
-        print "-----------------------------------------------------------------------------------------------------------------------"
-        print "-----------------------------------------------------------------------------------------------------------------------"
-
-        logging.info('Parsing Content')
-
-        # logging.info(content_part)
-
-        # Parse all tables to be able to loop over (the page looks different all the time )
-        # content_part_tr = content_part.findall(".//tr")
-
-        return
-
-        print "-----------------------"
-        for tr in content_part_tr:
-            print "-------TR---------"
-            print tr
-
-        try:
-            table_content = content_part_tr[0]
-        except Exception as e:
-            logging.error('ERROR : content_part_tr is not correct, maybe content changed at target?')
-            logging.error(e)
+        self.ticket.status='success-priced'
+        self.ticket.put()
 
     def get_source(self):
-        super(TopEvent24_Main, self).get_source()
+        super(TopEvent24Main, self).get_source()
         return self.source_current

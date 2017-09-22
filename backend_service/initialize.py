@@ -21,7 +21,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 class SearchUpdateController(webapp2.RequestHandler):
     def get(self):
-        tickets = Ticket().query()
+        tickets = Ticket().query(Ticket.status=='success-priced')
         for ticket in tickets:
             ticket.build_search_index()
 
@@ -120,7 +120,7 @@ class InitController(webapp2.RequestHandler):
                 source.parser_file_detail = 'parser_topevent24_detail.py'
                 source_entities.append(source)
                 logging.info('source created ... ' + source.name)
-                break
+                #break
 
         logging.info('sources save ... ')
         ndb.put_multi(source_entities)

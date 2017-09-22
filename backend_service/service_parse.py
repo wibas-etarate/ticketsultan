@@ -34,7 +34,7 @@ class ParseController(webapp2.RequestHandler):
             logging.info('adding source to taskqueue ... ' + str(source_id))
 
             taskqueue.add(queue_name='sources', url='/admin/parser/parse_source/', params={'source_id': source_id})
-            source.status = 'parse'  # avoid adding the same elements multiple times
+            source.status = 'success'  # avoid adding the same elements multiple times
             source.put()
 
         template_values = {
@@ -53,7 +53,7 @@ class SourceController(webapp2.RequestHandler):
         source_id = str(self.request.get('source_id'))
         print "PARSE SOURCE START - SOURCE: " + str(source_id)
 
-        parser_topevent24 = TopEvent24_Main()
+        parser_topevent24 = TopEvent24Main()
         parser_topevent24.parse(source_id)
 
     def get(self):
@@ -65,7 +65,7 @@ class PriceController(webapp2.RequestHandler):
         ticket_id = str(self.request.get('ticket_id'))
         print "PRICE CONTROL START - TICKET: " + str(ticket_id)
 
-        parser_topevent24 = TopEvent24_Main()
+        parser_topevent24 = TopEvent24Main()
         parser_topevent24.parse_price(ticket_id)
 
     def get(self):
@@ -74,7 +74,7 @@ class PriceController(webapp2.RequestHandler):
 
 class CronJobController(webapp2.RequestHandler):
     def post(self):
-        tickets = Ticket().query(Ticket.status == 'success')
+        tickets = Ticket().query(Ticket.status == 'success').fetch(keys_only=True, limit=200)
 
         for ticket in tickets:
             taskqueue.add(queue_name='priceupdates', url='/admin/parser/parse_price/',
@@ -82,7 +82,7 @@ class CronJobController(webapp2.RequestHandler):
 
     def get(self):
         logging.info('starting cron as test')
-        tickets = Ticket().query(Ticket.status == 'success').fetch(limit=2)
+        tickets = Ticket().query(Ticket.status == 'success').fetch(keys_only=True, limit=200)
 
         for ticket in tickets:
             taskqueue.add(queue_name='priceupdates', url='/admin/parser/parse_price/',

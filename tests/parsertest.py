@@ -41,7 +41,7 @@ class SourceController(webapp2.RequestHandler):
         source_id = str(self.request.get('source_id'))
         print "PARSE SOURCE START - SOURCE: " + str(source_id)
         
-        parser_topevent24 = TopEvent24_Main()
+        parser_topevent24 = TopEvent24Main()
         parser_topevent24.parse(source_id)
 
     def get(self):
@@ -52,7 +52,7 @@ class PriceController(webapp2.RequestHandler):
         ticket_id = str(self.request.get('ticket_id'))
         print "PRICE CONTROL START - TICKET: " + str(ticket_id)
         
-        parser_topevent24 = TopEvent24_Main()
+        parser_topevent24 = TopEvent24Main()
         parser_topevent24.parse_price(ticket_id)
 
     def get(self):
