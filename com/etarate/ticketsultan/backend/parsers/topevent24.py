@@ -1,25 +1,15 @@
 # -*- coding: utf-8 -*-
 # !/usr/bin/env python
 import re
-import urlparse
 import urllib
-import traceback
+import urlparse
 from datetime import datetime
-from datetime import time
-import time
 
-from decimal import Decimal
-from lxml import html, etree
-from lxml.html.clean import Cleaner
-from google.appengine.api import urlfetch
-from google.appengine.api import taskqueue
-import logging
+from lxml import etree
 
-from com.etarate.ticketsultan.backend.parser import Parser
-
-from com.etarate.ticketsultan.backend.source import *
-from com.etarate.ticketsultan.backend.ticket import *
 from com.etarate.ticketsultan.backend.location import *
+from com.etarate.ticketsultan.backend.parsers.parser import Parser
+from com.etarate.ticketsultan.backend.ticket import *
 
 
 class TopEvent24Main(Parser):
@@ -88,17 +78,20 @@ class TopEvent24Main(Parser):
                             ticket_time = ticket_time.replace('_', '')  # remove the _
                             ticket_times = ticket_time.split(":")  # Split the string to get hour and minute separate
 
-                            # TODO add the time to datetime (there is some conflict with time and datetime class)
-                            # ticket_time = datetime.time(int(ticket_times[0]), int(ticket_times[1]),0)
+                            h = int(ticket_times[0])
+                            m = int(ticket_times[1])
+                            s = 0
+
+                            ticket_time = datetime(ticket_date.year, ticket_date.month, ticket_date.day, h, m, s)
                             # print str(ticket_time)
                             # print type(ticket_time)
-                            # ticket_date = datetime.combine(ticket_date, ticket_time)
+                            #ticket_date = datetime.combine(ticket_date, ticket_time)
 
                         logging.debug("creating new ticket")
                         ticket = Ticket()
                         ticket.url = "http://www.topevents24.de/shop/" + str(clean_url)
                         ticket.name = ticket_name
-                        ticket.start = ticket_date
+                        ticket.start = ticket_time
                         ticket.note = ticket_note.replace('_', ' ')
                         ticket.city = ticket_city_db.key
                         ticket.country = Country.query(Country.country_name == 'Deutschland').get().key
@@ -146,6 +139,7 @@ class TopEvent24Main(Parser):
             self.ticket.put()
             return
 
+        # TODO if there are multiple prices, extract them
         for tr in html_rows:
             if tr.attrib['class'] == 'thead':  # we ignore the head
                 pass

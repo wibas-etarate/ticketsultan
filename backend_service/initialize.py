@@ -120,8 +120,8 @@ class InitController(webapp2.RequestHandler):
                 source.parser_file_detail = 'parser_topevent24_detail.py'
                 source_entities.append(source)
                 logging.info('source created ... ' + source.name)
-                #break
-
+                break
+            break
         logging.info('sources save ... ')
         ndb.put_multi(source_entities)
         logging.info('sources save success ')

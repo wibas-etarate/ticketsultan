@@ -11,18 +11,24 @@ ticketsultan is a testproject for playing with google cloud services
 
 
 ## How to run all that stuff localy?
-###Run it from Google Cloud Console
+### Run it from Google Cloud Console
 
 	dev_appserver.py app.yaml
 
 ## Importand Endpoints
- ### Backend
+    Backend
+
     /admin/					#Admin UI
     /admin/sources/				#View and edit sources
-    /admin/init				#Preinitialization
+    /admin/tickets/				#View tickets
+    /admin/init				#Preinitialization of all sources, cities, locations, currencies, ...
+    /admin/init_search				#Reinizialize the search index
     /admin/parser/				#Parse sources
     /admin/parser/cron			#CRON Jobs
-  ### Frontend
+
+
+    Frontend
+
     /					#Frontend
     /search/				#Search Details
 
@@ -33,7 +39,7 @@ ticketsultan is a testproject for playing with google cloud services
 ## Run it local
     dev_appserver.py app.yaml
     
-## Run it with Visual Studio Code
+## Run it with Visual Studio Code (not prefered)
 - install Visual Studio Code
 - take the configuration files from .vscode
 - change the configuration to your needs
@@ -57,3 +63,6 @@ ticketsultan is a testproject for playing with google cloud services
     }
 
 
+## Run it with Pycharm 2017 (prefered)
+- all the stuff you need should be checked in
+- checkout and run
